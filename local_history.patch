@@ -1,0 +1,15 @@
+Index: src/main/java/service/SessionFactoryService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/service/SessionFactoryService.java	(revision )
++++ src/main/java/service/SessionFactoryService.java	(revision )
+@@ -16,6 +16,7 @@
+         if(sessionFactory == null){
+             sessionFactory = new AnnotationConfiguration().configure().buildSessionFactory();
+         }
++
+         return sessionFactory;
+     }
+     private static SessionFactory sessionFactory;
