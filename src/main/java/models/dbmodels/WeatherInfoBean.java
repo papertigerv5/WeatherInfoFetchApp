@@ -2,6 +2,7 @@ package models.dbmodels;
 
 import models.innerstorage.InTimeWeatherInfo;
 import models.innerstorage.StaticWeatherInfoBean;
+import models.locationInfo.CityDistrictBean;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -21,7 +22,7 @@ public class WeatherInfoBean {
     public WeatherInfoBean() {
     }
 
-    public WeatherInfoBean(InTimeWeatherInfo inTimeWeatherInfo, StaticWeatherInfoBean staticWeatherInfoBean) {
+    public WeatherInfoBean(InTimeWeatherInfo inTimeWeatherInfo, StaticWeatherInfoBean staticWeatherInfoBean,CityDistrictBean cityDistrictBean) {
 
         temperature = inTimeWeatherInfo.getTemperature();
         sweetDegree = inTimeWeatherInfo.getSweetDegree();
@@ -33,7 +34,12 @@ public class WeatherInfoBean {
         status = staticWeatherInfoBean.getStatus();
         waterCount = staticWeatherInfoBean.getWaterCount();
 
+        cityNo = cityDistrictBean.getCityNo();
+        districtNo = cityDistrictBean.getDistrictNo();
+        districtName = cityDistrictBean.getDiscritName();
+        provinceNo = cityDistrictBean.getProvinceNo();
         //TO-DO: add airPressure and evaporation. Not yet because haven't found where the information stores.
+
     }
 
     private long id;
@@ -156,6 +162,50 @@ public class WeatherInfoBean {
 
     public void setEvaporation(String evaporation) {
         this.evaporation = evaporation;
+    }
+
+    private String districtNo;
+
+    @Basic
+    public String getDistrictNo() {
+        return districtNo;
+    }
+
+    public void setDistrictNo(String districtNo) {
+        this.districtNo = districtNo;
+    }
+
+    private String districtName;
+
+    @Basic
+    public String getDistrictName() {
+        return districtName;
+    }
+
+    public void setDistrictName(String districtName) {
+        this.districtName = districtName;
+    }
+
+    private String cityNo;
+
+    @Basic
+    public String getCityNo() {
+        return cityNo;
+    }
+
+    public void setCityNo(String cityNo) {
+        this.cityNo = cityNo;
+    }
+
+    private String provinceNo;
+
+    @Basic
+    public String getProvinceNo() {
+        return provinceNo;
+    }
+
+    public void setProvinceNo(String provinceNo) {
+        this.provinceNo = provinceNo;
     }
 
 }
