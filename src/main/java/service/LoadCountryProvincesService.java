@@ -67,7 +67,7 @@ public class LoadCountryProvincesService {
             String cityDistrictNo = cityDistrictEntry.getKey();
             String cityDistrictName = cityDistrictEntry.getValue();
 
-            CityDistrictBean cityDistrictBean = new CityDistrictBean(provinceNo,cityNo,cityDistrictNo,cityDistrictName,locationParseService.isCenterCity(cityDistrictEntry.getKey()));
+            CityDistrictBean cityDistrictBean = new CityDistrictBean(provinceNo,cityNo,cityDistrictNo,cityDistrictName);
 
             cityDistrictBeanList.add(cityDistrictBean);
 
@@ -80,7 +80,6 @@ public class LoadCountryProvincesService {
 
     }
 
-    private LocationParseService locationParseService = LocationParseService.getLocationParseServiceInstance();
     private WeatherFectchService weatherFectchService = WeatherFectchService.getServiceInstance();
     private static LoadCountryProvincesService loadCountryProvincesService;
 }

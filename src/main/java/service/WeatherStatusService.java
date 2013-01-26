@@ -4,10 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,22 +38,19 @@ public class WeatherStatusService {
         return weatherStatueService;
     }
 
-    public String getCityWeatherStatusById(String cityNo){
-        List<Element> tableElements = getTableElementsInDiv(cityNo,"weather6h");
+    public String getCityWeatherStatusById(String htmlContent){
+        List<Element> tableElements = getTableElementsInDiv(htmlContent,"weather6h");
         String status = null;
         for(Element tableElement : tableElements){
             status = getContentByTableElement(tableElement,2,0);
             break;
         }
-
         return status;
     }
 
-    public String getCityDistrictWeatherStatusByDistrictId(String districtId){
-        List<Element> tableElements = getTableElementsInDiv(districtId,"7d");
-
+    public String getCityDistrictWeatherStatusByDistrictId(String htmlContent){
+        List<Element> tableElements = getTableElementsInDiv(htmlContent,"7d");
         String status = null;
-
         if(tableElements.size() > 3){
             status = getContentByTableElement(tableElements.get(1),0,3);
         }
@@ -66,13 +60,14 @@ public class WeatherStatusService {
 
 
 
-    private List<Element> getTableElementsInDiv(String id,String divId){
-        Document document = getDocumentById(id);
+    private List<Element> getTableElementsInDiv(String htmlContent,String divId){
+        Document document = getDocumentById(htmlContent);
         Element element = document.getElementById(divId);
         if(element == null){
-            System.out.print(id+"   ");
+            return (List<Element>) Collections.EMPTY_LIST;
+        } else {
+            return element.getElementsByTag("table");
         }
-        return element.getElementsByTag("table");
     }
 
     private String getContentByTableElement(Element tableElement,int rowIndex,int columnIndex){
@@ -88,12 +83,8 @@ public class WeatherStatusService {
 
         return null;
     }
-    private Document getDocumentById(String id){
-        String htmlUrl = URLHEADER + id + ".shtml";
-        String htmlString  = urlInfoService.fetchInfoFromUrl(htmlUrl);
-        Document document = Jsoup.parse(htmlString);
-
-        return document;
+    private Document getDocumentById(String htmlString){
+        return Jsoup.parse(htmlString);
     }
 
 
@@ -101,8 +92,5 @@ public class WeatherStatusService {
 
     }
 
-    private static final String URLHEADER = "http://www.weather.com.cn/weather/";
-
-    private URLInfoService urlInfoService = URLInfoService.getURLInfoServiceInstance();
     private static WeatherStatusService weatherStatueService;
 }

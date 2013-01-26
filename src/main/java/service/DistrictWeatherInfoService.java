@@ -2,10 +2,15 @@ package service;
 
 import com.google.gson.Gson;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 
+import models.websitebeans.WebSiteString;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -39,41 +44,73 @@ public class DistrictWeatherInfoService {
         return service;
     }
 
-    public WeatherInfoBean getDistrictWeatherInfo(CityDistrictBean cityDistrictBean){
+    public WeatherInfoBean getDistrictWeatherInfo(WebSiteString webSiteString){
         if(!stillValid()){
-            staticWeatherInfoBean = getDistrictStaticWeatherInfoBean(cityDistrictBean);
+            staticWeatherInfoBean = getDistrictStaticWeatherInfoBean(webSiteString);
         }
-        InTimeWeatherInfoSiteBean inTimeWeatherInfoBean = getDistrictInTimeWeatherInfoById(cityDistrictBean.getDistrictNo());
-        InTimeWeatherInfo inTimeWeatherInfo = new InTimeWeatherInfo(inTimeWeatherInfoBean);
+        InTimeWeatherInfoSiteBean inTimeWeatherInfoSiteBean = getDistrictInTimeWeatherInfoById(webSiteString);
+        InTimeWeatherInfo inTimeWeatherInfo = new InTimeWeatherInfo(inTimeWeatherInfoSiteBean);
 
-        return new WeatherInfoBean(inTimeWeatherInfo,staticWeatherInfoBean,cityDistrictBean);
+        return new WeatherInfoBean(inTimeWeatherInfo,staticWeatherInfoBean,webSiteString.getCityDistrictBean());
+
     }
 
-    private InTimeWeatherInfoSiteBean getDistrictInTimeWeatherInfoById(String districtId){
-        String districtUrl = WEATHERHEADER + districtId + ".html";
+    private InTimeWeatherInfoSiteBean getDistrictInTimeWeatherInfoById(WebSiteString webSiteString){
 
-        String jsonString = urlInfoService.fetchInfoFromUrl(districtUrl);
-        Gson gson = new Gson();
-        InTimeWeatherInfoJsonBean districtDirectWeatherInfoBean = new InTimeWeatherInfoJsonBean();
-        districtDirectWeatherInfoBean = gson.fromJson(jsonString,districtDirectWeatherInfoBean.getClass());
+        String xmlContent = webSiteString.getHttpXmlString();
+        if(!webSiteString.isXmlFormatError()){
+            Gson gson = new Gson();
+            InTimeWeatherInfoJsonBean districtDirectWeatherInfoBean = new InTimeWeatherInfoJsonBean();
+            districtDirectWeatherInfoBean = gson.fromJson(xmlContent,districtDirectWeatherInfoBean.getClass());
 
-        return  districtDirectWeatherInfoBean.getWeatherinfo();
+            return  districtDirectWeatherInfoBean.getWeatherinfo();
+        }else{
+            System.out.println(xmlContent);
+            return null;
+        }
     }
 
-    private StaticWeatherInfoBean getDistrictStaticWeatherInfoBean(CityDistrictBean cityDistrictBean){
-
-        String sweetDegree = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.SWEETDEGREE);
-        String waterCount  = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.WATERCOUNT);
-        String temperature = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.TEMPERATURE);
+    private StaticWeatherInfoBean getDistrictStaticWeatherInfoBean(WebSiteString siteString){
+        String waterCount = NOTSETERROR;
+        CityDistrictBean cityDistrictBean = siteString.getCityDistrictBean();
+        String xmlContent = siteString.getXmlContentString();
+        if(!siteString.isXmlError()){
+            List<Element> elements = parseStringToDocument(xmlContent);
+            if(elements == null){
+                waterCount = NOTSETERROR;
+                writeNotSatisfiedCityDistrict(cityDistrictBean);
+                cityDistrictBean.setSetWaterCount(Boolean.FALSE);
+            } else {
+                waterCount  = getAttributeValueByElementsAndAttributeName(elements, StaticWeatherInfoBean.WATERCOUNT);
+            }
+        }
 
         String status = "";
+        String sHtmlContent = siteString.getHttpContentString();
         if(cityDistrictBean.isCenterCity()){
-            status = weatherStatusService.getCityWeatherStatusById(cityDistrictBean.getDistrictNo());
+            status = weatherStatusService.getCityWeatherStatusById(sHtmlContent);
+            if(status==null){
+                status = weatherStatusService.getCityDistrictWeatherStatusByDistrictId(sHtmlContent);
+            }
         }else{
-            status = weatherStatusService.getCityDistrictWeatherStatusByDistrictId(cityDistrictBean.getDistrictNo());
+            status = weatherStatusService.getCityDistrictWeatherStatusByDistrictId(sHtmlContent);
+            if(status == null){
+                status = weatherStatusService.getCityWeatherStatusById(sHtmlContent);
+            }
         }
 
         return new StaticWeatherInfoBean(status,waterCount);
+    }
+
+    private void writeNotSatisfiedCityDistrict(CityDistrictBean cityDistrictBean){
+        File file = new File("noneDistrict.txt");
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file,true));
+            bufferedWriter.write(cityDistrictBean.getDistrictNo() + " : " + cityDistrictBean.getDiscritName());
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     /**
@@ -86,14 +123,22 @@ public class DistrictWeatherInfoService {
 
     }
 
-    private String getAttributeByDIdAndAttributeName(String districtId,String attributeName){
-        String districtUrl = FLASHHEADER + districtId + ".xml";
-        String sweetDegree = null;
-        String xmlString = urlInfoService.fetchInfoFromUrl(districtUrl);
-        try {
-            Document document = DocumentHelper.parseText(xmlString);
-            Element  element = document.getRootElement();
-            List<Element> children = element.elements();
+    private List<Element> parseStringToDocument(String xmlContent){
+        try{
+            Document document = DocumentHelper.parseText(xmlContent);
+            return document.getRootElement().elements();
+        } catch (Exception ex){
+            System.out.println(xmlContent);
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getAttributeValueByElementsAndAttributeName(List<Element> children, String attributeName){
+
+        String attributeValue = "";
+        if(children != null && !children.isEmpty()){
+
             Date currentDate = new Date();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH");
             String hour = simpleDateFormat.format(currentDate);
@@ -102,16 +147,12 @@ public class DistrictWeatherInfoService {
                 Attribute hourAttr = cElement.attribute("h");
                 if(hour.equals(hourAttr.getValue())){
                     Attribute swAttr = cElement.attribute(attributeName);
-                    sweetDegree = swAttr.getValue();
+                    attributeValue = swAttr.getValue();
                     break;
                 }
             }
-        } catch (Exception ex){
-            ex.printStackTrace();
         }
-
-
-        return sweetDegree;
+        return attributeValue;
     }
 
     private DistrictWeatherInfoService(){
@@ -122,8 +163,9 @@ public class DistrictWeatherInfoService {
     private URLInfoService urlInfoService = URLInfoService.getURLInfoServiceInstance();
     private WeatherStatusService weatherStatusService = WeatherStatusService.getWeatherStatueServiceInstance();
 
-    private static final String WEATHERHEADER = "http://www.weather.com.cn/data/sk/";
-    private static final String FLASHHEADER = "http://flash.weather.com.cn/sk2/";
+
+    private static final String NOTSETERROR = "没有设置属性";
+
     private static DistrictWeatherInfoService service;
 
 }

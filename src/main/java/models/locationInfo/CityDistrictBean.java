@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class CityDistrictBean {
 
-    public CityDistrictBean(String provinceNo,String cityNo, String districtNo, String districtName,boolean centerCity) {
+    public CityDistrictBean(String provinceNo,String cityNo, String districtNo, String districtName) {
         this.provinceNo = provinceNo;
         this.cityNo = cityNo;
         this.districtNo = districtNo;
@@ -21,8 +21,15 @@ public class CityDistrictBean {
         } else {
             this.districtNo = cityNo + districtNo;
         }
+        if(!isDirectCity(districtNo)){
+            centerCity = districtNo.endsWith(CENTERCITYNO);
+        } else{
+            centerCity = districtNo.substring(0,districtNo.length()-2).endsWith(CENTERCITYNO);
+        }
         this.discritName = districtName;
-        this.centerCity = centerCity;
+
+        //Default set the flag of the waterCount is true.
+        this.setWaterCount = true;
     }
 
     public String getCityNo() {
@@ -57,12 +64,37 @@ public class CityDistrictBean {
         this.discritName = discritName;
     }
 
+    public boolean isSetWaterCount() {
+        return setWaterCount;
+    }
+
+    public void setSetWaterCount(boolean setWaterCount) {
+        this.setWaterCount = setWaterCount;
+    }
+
     public boolean isSpecialProvince() {
         return provinceNo.equals(specialProvinceNo);
     }
 
     public boolean isSpecialDistrictNo() {
         return specialDistrictNoList.contains(districtNo);
+    }
+
+    public void setCenterCity(boolean centerCity) {
+        this.centerCity = centerCity;
+    }
+
+    /**
+     * Check if the city is governed by the part directly.
+     * @param districtNo: the given city id.
+     * @return: if the districtNo is from a direct city governed by party directly.
+     */
+    public static boolean isDirectCity(String districtNo){
+        return districtNo.startsWith("10101") ||
+                districtNo.startsWith("10102") ||
+                districtNo.startsWith("10103") ||
+                districtNo.startsWith("10104");
+
     }
 
     @Override
@@ -76,7 +108,10 @@ public class CityDistrictBean {
     private boolean centerCity;
     private boolean specialProvince;
     private boolean specialCity;
+    private boolean setWaterCount;
 
+    public static String DIRECTCITYTAIL = "00";
+    public static String CENTERCITYNO = "01";
     private static String specialProvinceNo = "10131";
     private static List<String> specialDistrictNoList = Arrays.asList(new String[]{"101201406","101081108"});
 }
