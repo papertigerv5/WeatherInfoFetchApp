@@ -65,8 +65,8 @@ public class DistrictWeatherInfoService {
 
             return  districtDirectWeatherInfoBean.getWeatherinfo();
         }else{
-            System.out.println(xmlContent);
-            return null;
+            System.out.println(webSiteString.getCityDistrictBean().getDistrictNo() + "   :  " +xmlContent);
+            return new InTimeWeatherInfoSiteBean();
         }
     }
 
@@ -76,16 +76,12 @@ public class DistrictWeatherInfoService {
         String xmlContent = siteString.getXmlContentString();
         if(!siteString.isXmlError()){
             List<Element> elements = parseStringToDocument(xmlContent);
-            if(elements == null){
-                waterCount = NOTSETERROR;
-                writeNotSatisfiedCityDistrict(cityDistrictBean);
-                cityDistrictBean.setSetWaterCount(Boolean.FALSE);
-            } else {
+            if(elements != null){
                 waterCount  = getAttributeValueByElementsAndAttributeName(elements, StaticWeatherInfoBean.WATERCOUNT);
             }
         }
 
-        String status = "";
+        String status = NOTSETERROR;
         String sHtmlContent = siteString.getHttpContentString();
         if(cityDistrictBean.isCenterCity()){
             status = weatherStatusService.getCityWeatherStatusById(sHtmlContent);
@@ -99,18 +95,11 @@ public class DistrictWeatherInfoService {
             }
         }
 
-        return new StaticWeatherInfoBean(status,waterCount);
-    }
-
-    private void writeNotSatisfiedCityDistrict(CityDistrictBean cityDistrictBean){
-        File file = new File("noneDistrict.txt");
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file,true));
-            bufferedWriter.write(cityDistrictBean.getDistrictNo() + " : " + cityDistrictBean.getDiscritName());
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        if(status == null){
+            status = NOTSETERROR;
         }
+
+        return new StaticWeatherInfoBean(status,waterCount);
     }
 
     /**

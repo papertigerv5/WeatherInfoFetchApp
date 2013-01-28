@@ -26,7 +26,7 @@ public class FetchCityDistrictWeatherApp {
     public static void main(String[] args){
         FetchCityDistrictWeatherApp app = new FetchCityDistrictWeatherApp();
 
-        app.startFetchWeatherInfoSerial();
+        app.startFetchWeatherInfo();
     }
 
 
@@ -40,6 +40,8 @@ public class FetchCityDistrictWeatherApp {
             WebSiteString webSiteString = downloadWebSiteString(cityDistrictBean);
             parseWebSiteStringToDB(webSiteString,session);
         }
+
+        session.close();
     }
 
     public void startFetchWeatherInfo(){
@@ -49,7 +51,7 @@ public class FetchCityDistrictWeatherApp {
             @Override
             public void run() {
                 DownLoadWebResourceHelper[] produceThreads = new DownLoadWebResourceHelper[PRODUCETHREADCOUNT];
-                ExecutorService executorService = Executors.newFixedThreadPool(5);
+                ExecutorService executorService = Executors.newFixedThreadPool(PRODUCETHREADCOUNT+1);
                 for(int index = 0; index < PRODUCETHREADCOUNT; index++){
                     produceThreads[index] = new DownLoadWebResourceHelper(index);
                     executorService.submit(produceThreads[index]);
@@ -58,6 +60,7 @@ public class FetchCityDistrictWeatherApp {
                 executorService.shutdown();
             }
         },0,timeGap);
+
     }
 
     private class DownLoadWebResourceHelper implements Runnable{
@@ -65,33 +68,38 @@ public class FetchCityDistrictWeatherApp {
             int size = cityDistrictBeanList.size();
             int unit = size/PRODUCETHREADCOUNT;
             startIndex = n*unit;
-            if((n+1)*unit < size){
-                endIndex = (n+1)*unit;
-            } else {
+            if(n == PRODUCETHREADCOUNT-1){
                 endIndex = size;
+            }   else {
+                endIndex = (n+1)*unit;
             }
+
+            System.out.println("Thread " + n + " start from " + startIndex + "  to  " + endIndex);
         }
 
         @Override
         public void run() {
+            long currentMills = System.currentTimeMillis();
             int pIndex = startIndex;
-            int count = 0;
             while(pIndex < endIndex){
                 long currentMillls = System.currentTimeMillis();
                 WebSiteString webSiteString = downloadWebSiteString(cityDistrictBeanList.get(pIndex++));
                 long cost = System.currentTimeMillis() - currentMillls;
                 System.out.println(" Download  "+(pIndex-1) + "   :   cost  " + cost + " mill seconds");
-                count++;
                 try {
                     productString.put(webSiteString);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            try {
-                productString.put(new WebSiteString());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            long cost = System.currentTimeMillis() - currentMills;
+            System.out.println("Thead" + startIndex + " Cost : " + cost/1000/60);
+            if(endIndex == cityDistrictBeanList.size()){
+                try {
+                    productString.put(new WebSiteString());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -143,7 +151,7 @@ public class FetchCityDistrictWeatherApp {
     private BlockingQueue<WebSiteString> productString = new LinkedBlockingQueue<WebSiteString>();
     private final int CACHECOUNT = 100;
     private final int PRODUCETHREADCOUNT = 4;
-    private long timeGap = 60*60*1000;   //An hour.
+    private long timeGap = 45*60*1000;   //An hour.
 
     private Map<String,WeatherInfoBean> latestWeatherInfoMap = new HashMap<String, WeatherInfoBean>();
     private Map<String,Boolean> inValidDistrict = new HashMap<String, Boolean>();

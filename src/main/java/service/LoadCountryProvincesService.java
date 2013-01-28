@@ -49,10 +49,9 @@ public class LoadCountryProvincesService {
         for(Map.Entry<String,String> cityMapEntry : provinceCitiesMap.entrySet()){
             String cityNo = cityMapEntry.getKey();
             String cityName = cityMapEntry.getValue();
-            CityBean currentCityBean = initCityBean(provinceNo,provinceNo+cityNo,cityName);
+            CityBean currentCityBean = initCityBean(provinceNo,cityNo,cityName);
 
             cityBeanList.add(currentCityBean);
-
         }
 
         return provinceBean;
@@ -60,17 +59,16 @@ public class LoadCountryProvincesService {
 
     private CityBean initCityBean(String provinceNo,String cityNo,String cityName){
         CityBean cityBean = new CityBean(provinceNo,cityNo,cityName);
+        cityNo = cityBean.getCityNo();
         Map<String,String> cityDistrict = weatherFectchService.encodingCityDistrict(cityNo);
         List<CityDistrictBean> cityDistrictBeanList = cityBean.getDistrictBeanList();
         for(Map.Entry<String,String> cityDistrictEntry : cityDistrict.entrySet()){
 
             String cityDistrictNo = cityDistrictEntry.getKey();
             String cityDistrictName = cityDistrictEntry.getValue();
-
             CityDistrictBean cityDistrictBean = new CityDistrictBean(provinceNo,cityNo,cityDistrictNo,cityDistrictName);
 
             cityDistrictBeanList.add(cityDistrictBean);
-
         }
 
         return cityBean;

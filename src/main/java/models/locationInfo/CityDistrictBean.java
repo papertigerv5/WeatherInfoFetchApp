@@ -14,22 +14,23 @@ public class CityDistrictBean {
 
     public CityDistrictBean(String provinceNo,String cityNo, String districtNo, String districtName) {
         this.provinceNo = provinceNo;
+        this.discritName = districtName;
         this.cityNo = cityNo;
         this.districtNo = districtNo;
-        if(isSpecialProvince() || isSpecialDistrictNo()){
-            this.districtNo = districtNo;
-        } else {
-            this.districtNo = cityNo + districtNo;
-        }
-        if(!isDirectCity(districtNo)){
-            centerCity = districtNo.endsWith(CENTERCITYNO);
-        } else{
-            centerCity = districtNo.substring(0,districtNo.length()-2).endsWith(CENTERCITYNO);
-        }
-        this.discritName = districtName;
 
-        //Default set the flag of the waterCount is true.
-        this.setWaterCount = true;
+        if(!isDirectCity(provinceNo)){
+            if(isSpecialProvince() || isSpecialDistrictNo()){
+                this.districtNo = districtNo;
+            } else {
+                this.districtNo = cityNo + districtNo;
+            }
+            centerCity = this.districtNo.endsWith(CENTERCITYNO);
+        } else{
+            this.districtNo = provinceNo + districtNo + DIRECTCITYTAIL;
+            centerCity = this.districtNo.substring(0,this.districtNo.length()-2).endsWith(CENTERCITYNO);
+
+        }
+
     }
 
     public String getCityNo() {
@@ -64,14 +65,6 @@ public class CityDistrictBean {
         this.discritName = discritName;
     }
 
-    public boolean isSetWaterCount() {
-        return setWaterCount;
-    }
-
-    public void setSetWaterCount(boolean setWaterCount) {
-        this.setWaterCount = setWaterCount;
-    }
-
     public boolean isSpecialProvince() {
         return provinceNo.equals(specialProvinceNo);
     }
@@ -86,14 +79,14 @@ public class CityDistrictBean {
 
     /**
      * Check if the city is governed by the part directly.
-     * @param districtNo: the given city id.
+     * @param provinceNo: the given city id.
      * @return: if the districtNo is from a direct city governed by party directly.
      */
-    public static boolean isDirectCity(String districtNo){
-        return districtNo.startsWith("10101") ||
-                districtNo.startsWith("10102") ||
-                districtNo.startsWith("10103") ||
-                districtNo.startsWith("10104");
+    public static boolean isDirectCity(String provinceNo){
+        return provinceNo.equals("10101") ||
+                provinceNo.equals("10102") ||
+                provinceNo.equals("10103") ||
+                provinceNo.equals("10104");
 
     }
 
@@ -108,7 +101,6 @@ public class CityDistrictBean {
     private boolean centerCity;
     private boolean specialProvince;
     private boolean specialCity;
-    private boolean setWaterCount;
 
     public static String DIRECTCITYTAIL = "00";
     public static String CENTERCITYNO = "01";
