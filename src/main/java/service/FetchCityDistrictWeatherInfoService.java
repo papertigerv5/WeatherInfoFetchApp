@@ -24,19 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class FetchCityDistrictWeatherInfoService {
 
     public void startFetchCityDistrictScheduledActions(){
-        fetchScheduledTimer.schedule(fetchCityWeatherInfoTimerTask,0,TIMEGAP);
-    }
-
-    public void startFetchCityDistrictAction(){
-        int testCounts = 4;
-        for (int cityDistrictIndex = 0; cityDistrictIndex < testCounts; cityDistrictIndex++){
-            System.out.println("Start from " + cityDistrictIndex);
-            CityDistrictBean cityDistrictBean = cityDistrictBeans.get(cityDistrictIndex);
-            WebSiteBean webSiteBean = downloadWebSiteBeansFromCountryService.downLoadWebSiteBeanFromCityDistrictBean(cityDistrictBean);
-            WeatherInfoBean weatherInfoBean = parseWebSiteBeanToWeatherInfoBeanService.parseWebSiteToWeatherInfoBean(webSiteBean);
-            storeWeatherInfoBeanService.storeWeatherInfoBean(weatherInfoBean);
-            System.out.println("End from " + cityDistrictIndex);
-        }
+        new FetchCityWeatherInfoTimerTask().run();
     }
 
     public void reloadCountryInfo(String countryName){
@@ -79,6 +67,8 @@ public class FetchCityDistrictWeatherInfoService {
             for (int threadIndex = 0; threadIndex < PARSEANDSAVETHREADCOUNTS; threadIndex++){
                 executorService.submit(parseAndSaveJobs[threadIndex]);
             }
+
+            executorService.shutdown();
         }
 
     }
@@ -161,9 +151,24 @@ public class FetchCityDistrictWeatherInfoService {
                 e.printStackTrace();
             }
             //Try to recommand the jvm to restore its memory resource.!
-            System.gc();
+            tryToReleaseMemory();
             System.out.println(count + " WeatherInfoBeans Saved the Finished");
         }
+    }
+
+    private class TestRunnable implements Runnable{
+        @Override
+        public void run(){
+            System.out.println("Test Runnable");
+        }
+    }
+
+    private void tryToReleaseMemory(){
+        Runtime runtime = Runtime.getRuntime();
+        runtime.gc();
+        runtime.gc();
+        runtime.gc();
+        runtime.gc();
     }
 
     //Location Info beans.
@@ -187,8 +192,6 @@ public class FetchCityDistrictWeatherInfoService {
 
     //Thread end synchronized parameters.
     private boolean finished[] = new boolean[DOWNLOADTHEADCOUNTS];
-    //Schedule Timers.
-    private Timer fetchScheduledTimer = new Timer();
 
     //Services.
     private LoadCountryProvincesService loadCountryProvincesService = LoadCountryProvincesService.getLoadCountryProvinceServiceInstance();

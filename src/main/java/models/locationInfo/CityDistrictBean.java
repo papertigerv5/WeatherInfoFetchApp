@@ -1,5 +1,9 @@
 package models.locationInfo;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +14,10 @@ import java.util.List;
  * Time: 下午7:49
  * To change this template use File | Settings | File Templates.
  */
+@Entity
 public class CityDistrictBean {
+
+    public CityDistrictBean(){}
 
     public CityDistrictBean(String provinceNo,String cityNo, String districtNo, String districtName) {
         this.provinceNo = provinceNo;
@@ -94,6 +101,44 @@ public class CityDistrictBean {
     public String toString(){
         return districtNo;
     }
+
+    public boolean isSpecialCity() {
+        return specialCity;
+    }
+
+    public void setSpecialCity(boolean specialCity) {
+        this.specialCity = specialCity;
+    }
+
+    public static String getDIRECTCITYTAIL() {
+        return DIRECTCITYTAIL;
+    }
+
+    public static void setDIRECTCITYTAIL(String DIRECTCITYTAIL) {
+        CityDistrictBean.DIRECTCITYTAIL = DIRECTCITYTAIL;
+    }
+
+    public static String getCENTERCITYNO() {
+        return CENTERCITYNO;
+    }
+
+    public static void setCENTERCITYNO(String CENTERCITYNO) {
+        CityDistrictBean.CENTERCITYNO = CENTERCITYNO;
+    }
+
+    public static String getSpecialProvinceNo() {
+        return specialProvinceNo;
+    }
+
+    public static void setSpecialProvinceNo(String specialProvinceNo) {
+        CityDistrictBean.specialProvinceNo = specialProvinceNo;
+    }
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
     private String provinceNo;
     private String cityNo;
     private String districtNo;

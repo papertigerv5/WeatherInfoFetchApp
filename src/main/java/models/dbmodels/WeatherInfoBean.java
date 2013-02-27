@@ -4,10 +4,7 @@ import models.innerstorage.InTimeWeatherInfo;
 import models.innerstorage.StaticWeatherInfoBean;
 import models.locationInfo.CityDistrictBean;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,7 +20,10 @@ public class WeatherInfoBean {
     }
 
     public WeatherInfoBean(InTimeWeatherInfo inTimeWeatherInfo, StaticWeatherInfoBean staticWeatherInfoBean,CityDistrictBean cityDistrictBean) {
+        updateBeanProperties(inTimeWeatherInfo, staticWeatherInfoBean, cityDistrictBean);
+    }
 
+    public void updateBeanProperties(InTimeWeatherInfo inTimeWeatherInfo, StaticWeatherInfoBean staticWeatherInfoBean, CityDistrictBean cityDistrictBean){
         temperature = inTimeWeatherInfo.getTemperature();
         sweetDegree = inTimeWeatherInfo.getSweetDegree();
         windDirection = inTimeWeatherInfo.getWindDirection();
@@ -44,8 +44,8 @@ public class WeatherInfoBean {
 
     private long id;
 
-    @GeneratedValue
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long getId() {
         return id;
     }

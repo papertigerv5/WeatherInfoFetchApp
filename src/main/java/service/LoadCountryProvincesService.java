@@ -1,9 +1,12 @@
 package service;
 
+import models.dbmodels.WeatherInfoBean;
 import models.locationInfo.CityBean;
 import models.locationInfo.CityDistrictBean;
 import models.locationInfo.CountryBean;
 import models.locationInfo.ProvinceBean;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +28,45 @@ public class LoadCountryProvincesService {
         return loadCountryProvincesService;
     }
 
-    public CountryBean InitCountryInfomation(String countryName){
-        CountryBean countryBean = new CountryBean(countryName);
+    public void reloadCityDistrictInfo(String countryName){
+        clearCityDistrictBeanFromDB();
+        saveCityDistrictBeanToDB(countryName);
+
+    }
+    /**
+     * Save all city district bean to db.
+     * */
+    private void saveCityDistrictBeanToDB(String countryName){
+        if(countryBean == null){
+            countryBean = initCountryInfomation(countryName);
+            if(countryBean == null){
+                countryBean = initCountryInfomation(DEFAULTCOUNTRY);
+            }
+        }
+
+        List<CityDistrictBean> cityDistrictBeanList = countryBean.getCityDistrictList();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        for(CityDistrictBean cityDistrictBean : cityDistrictBeanList){
+            session.save(cityDistrictBean);
+        }
+        session.getTransaction().commit();
+    }
+    /**
+     * Clear all city district bean from db.
+     * */
+    private void clearCityDistrictBeanFromDB(){
+    }
+
+    /**
+     * Init the Country bean from website.
+     * @param countryName: the name of the country.
+     * @return:
+     *
+     *          The country bean which contains its name, its province beans which contains city beans.
+     */
+    private CountryBean initCountryInfomation(String countryName){
+        countryBean = new CountryBean(countryName);
         List<ProvinceBean> provinceBeanList = countryBean.getProvinceBeanList();
         Map<String,String> countryNoNameMap = weatherFectchService.encodingCountryProvinces(countryBean.getCountryName());
         for(Map.Entry<String,String> entry : countryNoNameMap.entrySet()){
@@ -78,6 +118,12 @@ public class LoadCountryProvincesService {
 
     }
 
+    public static final String DEFAULTCOUNTRY = "china";
+
+    private CountryBean countryBean;
     private WeatherFectchService weatherFectchService = WeatherFectchService.getServiceInstance();
     private static LoadCountryProvincesService loadCountryProvincesService;
+    private SessionFactory sessionFactory = SessionFactoryService.getSessionFactory();
+
+
 }

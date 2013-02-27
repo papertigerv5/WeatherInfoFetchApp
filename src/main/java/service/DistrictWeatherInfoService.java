@@ -2,15 +2,11 @@ package service;
 
 import com.google.gson.Gson;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-import models.websitebeans.WebSiteString;
+import models.websitebeans.WebSiteBean;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -44,7 +40,7 @@ public class DistrictWeatherInfoService {
         return service;
     }
 
-    public WeatherInfoBean getDistrictWeatherInfo(WebSiteString webSiteString){
+    public WeatherInfoBean getDistrictWeatherInfo(WebSiteBean webSiteString){
         if(!stillValid()){
             staticWeatherInfoBean = getDistrictStaticWeatherInfoBean(webSiteString);
         }
@@ -55,7 +51,7 @@ public class DistrictWeatherInfoService {
 
     }
 
-    private InTimeWeatherInfoSiteBean getDistrictInTimeWeatherInfoById(WebSiteString webSiteString){
+    private InTimeWeatherInfoSiteBean getDistrictInTimeWeatherInfoById(WebSiteBean webSiteString){
 
         String xmlContent = webSiteString.getHttpXmlString();
         if(!webSiteString.isXmlFormatError()){
@@ -70,7 +66,7 @@ public class DistrictWeatherInfoService {
         }
     }
 
-    private StaticWeatherInfoBean getDistrictStaticWeatherInfoBean(WebSiteString siteString){
+    private StaticWeatherInfoBean getDistrictStaticWeatherInfoBean(WebSiteBean siteString){
         String waterCount = NOTSETERROR;
         CityDistrictBean cityDistrictBean = siteString.getCityDistrictBean();
         String xmlContent = siteString.getXmlContentString();

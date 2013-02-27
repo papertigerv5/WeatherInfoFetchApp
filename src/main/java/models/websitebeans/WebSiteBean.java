@@ -9,13 +9,17 @@ import models.locationInfo.CityDistrictBean;
  * Time: 下午12:46
  * To change this template use File | Settings | File Templates.
  */
-public class WebSiteString {
+public class WebSiteBean {
 
-    public WebSiteString() {
+    public WebSiteBean() {
         this.endFlag = true;
     }
 
-    public WebSiteString(String httpContentString, String httpXmlString,String xmlContentString,CityDistrictBean cityDistrictBean) {
+    public WebSiteBean(String httpContentString, String httpXmlString, String xmlContentString, CityDistrictBean cityDistrictBean) {
+         setBeanProperties(httpContentString,httpXmlString,xmlContentString,cityDistrictBean);
+    }
+
+    public void setBeanProperties(String httpContentString,String httpXmlString,String xmlContentString,CityDistrictBean cityDistrictBean){
         this.httpContentString = httpContentString;
         this.httpXmlString = httpXmlString;
         this.xmlContentString = xmlContentString;

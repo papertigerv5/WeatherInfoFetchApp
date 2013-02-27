@@ -52,12 +52,11 @@ public class URLInfoService {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            sbr.delete(0,sbr.length());
             e.printStackTrace();
             System.out.println(urlName);
-            String str = fetchInfoFromUrl(urlName);
-            return str;
+            sbr.append(fetchInfoFromUrl(urlName));
         }
-
         return sbr.toString();
     }
     private URLInfoService(){
@@ -65,9 +64,6 @@ public class URLInfoService {
     }
 
     private static URLInfoService service;
-
-    private byte[] contentBytes  = new byte[1024000*8];
-    private final int MAXSIZE = 8*1024000;
 
     private static final String URLHEADER = "http://www.weather.com.cn/weather/";
     private static final String WEATHERHEADER = "http://www.weather.com.cn/data/sk/";
