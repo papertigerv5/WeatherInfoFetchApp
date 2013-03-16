@@ -20,7 +20,8 @@ public class ParseWebSiteBeanToWeatherInfoBeanService {
         return parseWebSiteBeanToWeatherInfoBeanService;
     }
     public WeatherInfoBean parseWebSiteToWeatherInfoBean(WebSiteBean webSiteBean){
-        return districtWeatherInfoService.getDistrictWeatherInfo(webSiteBean);
+//        return districtWeatherInfoService.getDistrictWeatherInfo(webSiteBean);
+        return null;
     }
 
 

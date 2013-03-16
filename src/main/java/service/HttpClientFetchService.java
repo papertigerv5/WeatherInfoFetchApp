@@ -34,11 +34,13 @@ public class HttpClientFetchService {
 
     public String getDWRString(String wholeUrl){
         String endUrl = wholeUrl.substring(wholeUrl.lastIndexOf(STRINGSLASH)+1);
-        String methodName = endUrl.substring(endUrl.indexOf(STRINGDOT),endUrl.lastIndexOf(STRINGDOT));
+        String methodName = endUrl.substring(endUrl.indexOf(STRINGDOT) + 1,endUrl.lastIndexOf(STRINGDOT));
         String scriptName = endUrl.substring(0,endUrl.indexOf(STRINGDOT));
 
         //Fetch whole string.
-        return getDWRString(endUrl,scriptName,methodName);
+        String wholeString =  getDWRString(wholeUrl,scriptName,methodName);
+
+        return dwrStringParseService.getHtmlStringByDwrString(wholeString);
     }
 
     private String getDWRString(String url,String scriptName,String methodName){
@@ -48,7 +50,7 @@ public class HttpClientFetchService {
         formparams.add(new BasicNameValuePair("callCount", "1"));
         formparams.add(new BasicNameValuePair("page", "/index.html"));
         formparams.add(new BasicNameValuePair("httpSessionId", ""));
-        formparams.add(new BasicNameValuePair("scriptSessionId", "C19BDD2E8FC1F7026ED31AABD839D581169"));
+        formparams.add(new BasicNameValuePair("scriptSessionId", "CD4493252C041B2E30C2734D652AA4F3463"));
         formparams.add(new BasicNameValuePair("c0-scriptName", scriptName));
         formparams.add(new BasicNameValuePair("c0-methodName", methodName));
         formparams.add(new BasicNameValuePair("c0-id", "0"));
@@ -84,6 +86,9 @@ public class HttpClientFetchService {
     //static properties.
     private static final String STRINGSLASH = "/";
     private static final String STRINGDOT = ".";
+
+
+    private DWRStringParseService dwrStringParseService = DWRStringParseService.getDWRStringParseServiceInstance();
 
 
     //services.

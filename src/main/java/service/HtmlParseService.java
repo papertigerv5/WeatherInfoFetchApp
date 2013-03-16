@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
 public class HtmlParseService {
 
 
-    public static HtmlParseService getHtmlParseService(){
+    public static HtmlParseService getHtmlParseServiceInstance(){
         if(htmlParseService == null){
             htmlParseService = new HtmlParseService();
         }
@@ -24,6 +25,21 @@ public class HtmlParseService {
         return htmlParseService;
     }
 
+
+    public List<ArrayList<String>> parseDWRString(String htmlString){
+
+        Document document = getDocumentByHtmlString(htmlString);
+        Element firstTableElement = getFirstTableElementInDocument(document);
+        List<Element> rowElements = firstTableElement.getElementsByTag(TABLEROWTAG);
+
+        List<ArrayList<String>> tableTextList = new ArrayList<ArrayList<String>>();
+        for(Element rowElement : rowElements){
+            ArrayList<String> columnTextList = getRowColumnTextByRowElement(rowElement);
+            tableTextList.add(columnTextList);
+        }
+
+        return tableTextList;
+    }
     public List<Element> getTableElementsInDiv(String url,String divId){
         Document document = getDocumentByUrl(url);
         Element element = document.getElementById(divId);
@@ -32,7 +48,6 @@ public class HtmlParseService {
         }
         return element.getElementsByTag("table");
     }
-
     public String getContentByTableElement(Element tableElement,int rowIndex,int columnIndex){
         List<Element> rowElements = tableElement.getElementsByTag("tr");
         if(rowIndex < rowElements.size()){
@@ -47,15 +62,44 @@ public class HtmlParseService {
         return null;
     }
     public Document getDocumentByUrl(String url){
-        String htmlString  = urlInfoService.fetchInfoFromUrl(url);
-        Document document = Jsoup.parse(htmlString);
+       return getDocumentByHtmlString(urlInfoService.fetchInfoFromUrl(url));
+    }
+    public Document getDocumentByHtmlString(String htmlString){
+        return Jsoup.parse(htmlString);
+    }
 
-        return document;
+
+    private ArrayList<String> getRowColumnTextByRowElement(Element rowElement){
+        List<Element> columnElements = rowElement.getElementsByTag(TABLECOLUMNTAG);
+        ArrayList<String> columnTextList = new ArrayList<String>();
+        for(Element columnElement : columnElements){
+            columnTextList.add(columnElement.text());
+        }
+
+        return columnTextList;
+    }
+
+    /**
+     * Fetch the first table element in the document if there is. Otherwise return null object.
+     * @param document
+     * @return
+     */
+    private Element getFirstTableElementInDocument(Document document){
+        List<Element> allTableElements = document.getElementsByTag(TABLETAG);
+        if(allTableElements != null && !allTableElements.isEmpty()){
+            return allTableElements.get(0);
+        }
+
+        return null;
     }
 
     private HtmlParseService(){
 
     }
+
+    private static final String TABLECOLUMNTAG = "td";
+    private static final String TABLEROWTAG = "tr";
+    private static final String TABLETAG = "table";
 
     private static HtmlParseService htmlParseService;
 

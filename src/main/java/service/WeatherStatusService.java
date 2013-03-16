@@ -1,10 +1,7 @@
 package service;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -78,6 +75,6 @@ public class WeatherStatusService {
 
     private static WeatherStatusService weatherStatueService;
 
-    private HtmlParseService htmlParseService = HtmlParseService.getHtmlParseService();
+    private HtmlParseService htmlParseService = HtmlParseService.getHtmlParseServiceInstance();
     private URLInfoService urlInfoService = URLInfoService.getURLInfoServiceInstance();
 }

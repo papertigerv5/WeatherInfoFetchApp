@@ -11,7 +11,7 @@ public class DWRStringParseService {
 
 
 
-    public DWRStringParseService getDWRStringParseServiceInstance(){
+    public static DWRStringParseService getDWRStringParseServiceInstance(){
         if(dwrStringParseService == null){
             dwrStringParseService = new DWRStringParseService();
         }
@@ -21,7 +21,7 @@ public class DWRStringParseService {
 
 
     public String getHtmlStringByDwrString(String dwrString){
-        return dwrString.substring(dwrString.indexOf(BEGINTAG),dwrString.lastIndexOf(ENDTAG));
+        return dwrString.substring(dwrString.indexOf(BEGINTAG),dwrString.lastIndexOf(ENDTAG)+1);
     }
 
 

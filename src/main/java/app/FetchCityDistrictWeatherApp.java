@@ -38,7 +38,7 @@ public class FetchCityDistrictWeatherApp {
 
 
     public void reloadCountryBean(String countryName){
-        countryBean = loadCountryProvincesService.InitCountryInfomation(countryName);
+//        countryBean = loadCountryProvincesService.InitCountryInfomation(countryName);
     }
 
     public void startFetchWeatherInfo(){
@@ -95,6 +95,6 @@ public class FetchCityDistrictWeatherApp {
 
     private static CountryBean countryBean;
     static {
-        countryBean = loadCountryProvincesService.InitCountryInfomation(DEFAULTCOUNTRY);
+//        countryBean = loadCountryProvincesService.InitCountryInfomation(DEFAULTCOUNTRY);
     }
 }

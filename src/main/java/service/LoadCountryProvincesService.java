@@ -106,9 +106,9 @@ public class LoadCountryProvincesService {
 
             String cityDistrictNo = cityDistrictEntry.getKey();
             String cityDistrictName = cityDistrictEntry.getValue();
-            CityDistrictBean cityDistrictBean = new CityDistrictBean(provinceNo,cityNo,cityDistrictNo,cityDistrictName);
+//            CityDistrictBean cityDistrictBean = new CityDistrictBean(provinceNo,cityNo,cityDistrictNo,cityDistrictName);
 
-            cityDistrictBeanList.add(cityDistrictBean);
+//            cityDistrictBeanList.add(cityDistrictBean);
         }
 
         return cityBean;

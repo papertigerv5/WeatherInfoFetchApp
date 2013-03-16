@@ -1,7 +1,12 @@
 package service;
 
 import models.dbmodels.RiverWaterStatisticsBean;
+import org.json.JSONException;
+import org.json.JSONTokener;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,7 +19,9 @@ import java.util.List;
  */
 public class RiverWaterInfoService {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws JSONException {
+        String str = "\u9ED1\u2014\u54C8\u5C14\u6EE8\u5E02\u9053\u91CC\u533A\u6CB3\u5E72\u8857";
+        System.out.println(str);
         RiverWaterInfoService riverWaterInfoService1 = RiverWaterInfoService.getDefaultRiverWaterInfoService();
         riverWaterInfoService1.fetchCurrentAllRiverWaterStatistics();
     }
@@ -34,15 +41,41 @@ public class RiverWaterInfoService {
 
         return riverWaterInfoService;
     }
-    public List<RiverWaterStatisticsBean> fetchCurrentAllRiverWaterStatistics(){
+    public List<RiverWaterStatisticsBean> fetchCurrentAllRiverWaterStatistics() throws JSONException {
 
         String remoteTotalString = httpClientFetchService.getDWRString(DEFAULTRIVERCOURSEURLHEADER);
 
+        remoteTotalString = convertUnicodeStringToChinese(remoteTotalString);
+
+        List<ArrayList<String>> tableTextList = htmlParseService.parseDWRString(remoteTotalString);
+
+        List<RiverWaterStatisticsBean> riverWaterStatisticsBeans = new ArrayList<RiverWaterStatisticsBean>();
+
+        for(ArrayList<String> rowTextList : tableTextList){
+            RiverWaterStatisticsBean riverWaterStatisticsBean = new RiverWaterStatisticsBean();
+            if(rowTextList.size() != RiverWaterStatisticsBean.PROPERTYCOUNT){
+                System.out.println("ERROR");
+                break;
+            }
+            riverWaterStatisticsBean.setValues(rowTextList);
+            riverWaterStatisticsBeans.add(riverWaterStatisticsBean);
+        }
         //TO-DO: fetch the real data.
-        return null;
+        return riverWaterStatisticsBeans;
     }
 
     public static final String DEFAULTRIVERCOURSEURLHEADER = "http://xxfb.hydroinfo.gov.cn/dwr/call/plaincall/IndexDwr.getZDHD_SSSQ.dwr";
+
+    private String convertUnicodeStringToChinese(String unicodeString){
+        String jsonFormatValue = "'" + unicodeString + "'";
+        try {
+            return new JSONTokener(jsonFormatValue).nextValue().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return null;
+    }
 
     private RiverWaterStatisticsBean parseSingleRiverWaterStatistics(String riverWaterStatisticsInfo){
         //TO-DO: To fetch the real data.
@@ -66,4 +99,5 @@ public class RiverWaterInfoService {
 
     //Service Instances;
     private HttpClientFetchService httpClientFetchService = HttpClientFetchService.getHttpClientFetchServiceInstance();
+    private HtmlParseService htmlParseService = HtmlParseService.getHtmlParseServiceInstance();
 }
