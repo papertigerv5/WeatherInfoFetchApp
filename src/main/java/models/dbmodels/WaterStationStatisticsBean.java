@@ -1,6 +1,8 @@
 package models.dbmodels;
 
 import javax.persistence.Entity;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -60,21 +62,35 @@ public class WaterStationStatisticsBean {
         this.publishDateInfo = publishDateInfo;
     }
 
-    public String getPubllishHourInfo() {
-        return publlishHourInfo;
+    public String getPublishHourInfo() {
+        return publishHourInfo;
     }
 
-    public void setPubllishHourInfo(String publlishHourInfo) {
-        this.publlishHourInfo = publlishHourInfo;
+    public void setPublishHourInfo(String publishHourInfo) {
+        this.publishHourInfo = publishHourInfo;
     }
 
-    private String riverName;
+    public void setValues(List<String> values){
+        waterStationName = values.get(0);
+        waterStationAddr = values.get(1);
+        riverName = values.get(2);
+        stationWaterLevel = values.get(3);
+        inStationFlowCount = values.get(4);
+        String dateInfo[] = values.get(5).split(" ");
+        Calendar calendar = Calendar.getInstance();
+        publishDateInfo = calendar.get(Calendar.YEAR) + "-" + dateInfo[0];
+        publishHourInfo = dateInfo[1];
+        damTopHeight = values.get(6);
+    }
+
     private String waterStationName;
+    private String waterStationAddr;
+    private String riverName;
     private String stationWaterLevel;
     private String inStationFlowCount;
     private String damTopHeight;
     private String publishDateInfo;
-    private String publlishHourInfo;
+    private String publishHourInfo;
 
     private Long publishDateValue;
 

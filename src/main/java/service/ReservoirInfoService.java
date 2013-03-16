@@ -1,5 +1,11 @@
 package service;
 
+import models.dbmodels.RiverWaterStatisticsBean;
+import models.dbmodels.WaterStationStatisticsBean;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: lenovo
@@ -9,6 +15,10 @@ package service;
  */
 public class ReservoirInfoService {
 
+    public static void main(String[] args){
+        ReservoirInfoService reservoirInfoService1 = ReservoirInfoService.getReservoirInfoServiceInstance();
+        reservoirInfoService1.fetchCurrentAllReservoirInfo();
+    }
 
     /**
      * Get ReservoirInfoService instance.
@@ -35,6 +45,27 @@ public class ReservoirInfoService {
         return reservoirInfoService;
     }
 
+
+    public List<WaterStationStatisticsBean> fetchCurrentAllReservoirInfo(){
+        String remoteWholeString = httpClientFetchService.getDWRString(DEFAULTURL);
+        remoteWholeString = unicodeConvertService.convertUnicodeStringToChinese(remoteWholeString);
+
+        List<ArrayList<String>> tableTextList = htmlParseService.parseDWRString(remoteWholeString);
+
+        List<WaterStationStatisticsBean> waterStationBeans = new ArrayList<WaterStationStatisticsBean>();
+
+        for(ArrayList<String> rowTextList : tableTextList){
+            WaterStationStatisticsBean waterStationBean = new WaterStationStatisticsBean();
+            if(rowTextList.size() != RiverWaterStatisticsBean.PROPERTYCOUNT){
+                System.out.println("ERROR");
+                break;
+            }
+            waterStationBean.setValues(rowTextList);
+            waterStationBeans.add(waterStationBean);
+        }
+        //TO-DO: fetch the real data.
+        return waterStationBeans;
+    }
     public String getReservoirInfoDWRString(){
         return httpClientFetchService.getDWRString(wholeUrl);
     }
@@ -53,9 +84,13 @@ public class ReservoirInfoService {
 
     //private services.
     private HttpClientFetchService httpClientFetchService = HttpClientFetchService.getHttpClientFetchServiceInstance();
+    private UnicodeConvertService unicodeConvertService = UnicodeConvertService.getUnicodeConvertServiceInstance();
+    private HtmlParseService htmlParseService = HtmlParseService.getHtmlParseServiceInstance();
 
     //private static properties.
     private static final String DEFAULTURL = "http://xxfb.hydroinfo.gov.cn/dwr/call/plaincall/IndexDwr.getZDSK_SSSQ.dwr";
+
+
 
     //private static instances.
     private static ReservoirInfoService reservoirInfoService;
