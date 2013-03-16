@@ -10,8 +10,4 @@ package dao;
  */
 public class WeatherInfoDAO {
 
-   public static void main(String[] args) {
-
-   }
-
 }

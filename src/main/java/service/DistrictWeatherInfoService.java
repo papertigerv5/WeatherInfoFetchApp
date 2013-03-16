@@ -61,19 +61,22 @@ public class DistrictWeatherInfoService {
     }
 
     private StaticWeatherInfoBean getDistrictStaticWeatherInfoBean(CityDistrictBean cityDistrictBean){
+       try {
+            String sweetDegree = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.SWEETDEGREE);
+            String waterCount  = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.WATERCOUNT);
+            String temperature = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.TEMPERATURE);
 
-        String sweetDegree = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.SWEETDEGREE);
-        String waterCount  = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.WATERCOUNT);
-        String temperature = getAttributeByDIdAndAttributeName(cityDistrictBean.getDistrictNo(),StaticWeatherInfoBean.TEMPERATURE);
-
-        String status = "";
-        if(cityDistrictBean.isCenterCity()){
-            status = weatherStatusService.getCityWeatherStatusById(cityDistrictBean.getDistrictNo());
-        }else{
-            status = weatherStatusService.getCityDistrictWeatherStatusByDistrictId(cityDistrictBean.getDistrictNo());
-        }
-
-        return new StaticWeatherInfoBean(status,waterCount);
+            String status = "";
+            if(cityDistrictBean.isCenterCity()){
+                status = weatherStatusService.getCityWeatherStatusById(cityDistrictBean.getDistrictNo());
+            }else{
+                status = weatherStatusService.getCityDistrictWeatherStatusByDistrictId(cityDistrictBean.getDistrictNo());
+            }
+           return new StaticWeatherInfoBean(status,waterCount);
+       } catch (Exception ex){
+           System.out.println(cityDistrictBean.getDistrictNo());
+       }
+        return null;
     }
 
     /**
@@ -107,6 +110,7 @@ public class DistrictWeatherInfoService {
                 }
             }
         } catch (Exception ex){
+            sweetDegree = NOTSETERROR;
             ex.printStackTrace();
         }
 
@@ -124,6 +128,7 @@ public class DistrictWeatherInfoService {
 
     private static final String WEATHERHEADER = "http://www.weather.com.cn/data/sk/";
     private static final String FLASHHEADER = "http://flash.weather.com.cn/sk2/";
+    private static final String NOTSETERROR = "没有设定错误";
     private static DistrictWeatherInfoService service;
 
 }

@@ -1,5 +1,7 @@
 package models.locationInfo;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import java.util.List;
  * Time: 下午7:49
  * To change this template use File | Settings | File Templates.
  */
+@Entity
 public class CityDistrictBean {
 
     public CityDistrictBean(String provinceNo,String cityNo, String districtNo, String districtName,boolean centerCity) {
@@ -70,6 +73,7 @@ public class CityDistrictBean {
         return districtNo;
     }
     private String provinceNo;
+    @Basic
     private String cityNo;
     private String districtNo;
     private String discritName;

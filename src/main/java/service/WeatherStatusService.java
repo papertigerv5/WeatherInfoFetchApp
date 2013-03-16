@@ -42,10 +42,11 @@ public class WeatherStatusService {
     }
 
     public String getCityWeatherStatusById(String cityNo){
-        List<Element> tableElements = getTableElementsInDiv(cityNo,"weather6h");
+        String url = URLHEADER + cityNo + ".shtml";
+        List<Element> tableElements = htmlParseService.getTableElementsInDiv(cityNo,"weather6h");
         String status = null;
         for(Element tableElement : tableElements){
-            status = getContentByTableElement(tableElement,2,0);
+            status = htmlParseService.getContentByTableElement(tableElement,2,0);
             break;
         }
 
@@ -53,12 +54,13 @@ public class WeatherStatusService {
     }
 
     public String getCityDistrictWeatherStatusByDistrictId(String districtId){
-        List<Element> tableElements = getTableElementsInDiv(districtId,"7d");
+        String url = URLHEADER + districtId + ".shtml";
+        List<Element> tableElements = htmlParseService.getTableElementsInDiv(url,"7d");
 
         String status = null;
 
         if(tableElements.size() > 3){
-            status = getContentByTableElement(tableElements.get(1),0,3);
+            status = htmlParseService.getContentByTableElement(tableElements.get(1),0,3);
         }
 
         return status;
@@ -66,35 +68,6 @@ public class WeatherStatusService {
 
 
 
-    private List<Element> getTableElementsInDiv(String id,String divId){
-        Document document = getDocumentById(id);
-        Element element = document.getElementById(divId);
-        if(element == null){
-            System.out.print(id+"   ");
-        }
-        return element.getElementsByTag("table");
-    }
-
-    private String getContentByTableElement(Element tableElement,int rowIndex,int columnIndex){
-        List<Element> rowElements = tableElement.getElementsByTag("tr");
-        if(rowIndex < rowElements.size()){
-            Element rowElement = rowElements.get(rowIndex);
-            List<Element> columnElements = rowElement.getElementsByTag("td");
-            if(columnIndex < columnElements.size()){
-                Element columnElement = columnElements.get(columnIndex);
-                return columnElement.text();
-            }
-        }
-
-        return null;
-    }
-    private Document getDocumentById(String id){
-        String htmlUrl = URLHEADER + id + ".shtml";
-        String htmlString  = urlInfoService.fetchInfoFromUrl(htmlUrl);
-        Document document = Jsoup.parse(htmlString);
-
-        return document;
-    }
 
 
     private WeatherStatusService(){
@@ -103,6 +76,8 @@ public class WeatherStatusService {
 
     private static final String URLHEADER = "http://www.weather.com.cn/weather/";
 
-    private URLInfoService urlInfoService = URLInfoService.getURLInfoServiceInstance();
     private static WeatherStatusService weatherStatueService;
+
+    private HtmlParseService htmlParseService = HtmlParseService.getHtmlParseService();
+    private URLInfoService urlInfoService = URLInfoService.getURLInfoServiceInstance();
 }

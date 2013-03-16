@@ -3,12 +3,24 @@ package app;
 import models.dbmodels.WeatherInfoBean;
 import models.locationInfo.CityDistrictBean;
 import models.locationInfo.CountryBean;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import service.DistrictWeatherInfoService;
 import service.LoadCountryProvincesService;
 import service.SessionFactoryService;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -21,10 +33,7 @@ import java.util.*;
 public class FetchCityDistrictWeatherApp {
 
     public static void main(String[] args){
-        FetchCityDistrictWeatherApp app = new FetchCityDistrictWeatherApp();
-        CityDistrictBean peking = countryBean.getProvinceBeanList().get(21).getCities().get(0).getDistrictBeanList().get(1);
 
-        app.startFetchWeatherInfo();
     }
 
 
@@ -51,7 +60,6 @@ public class FetchCityDistrictWeatherApp {
                     String districtNo = cityDistrictBean.getDistrictNo();
                     WeatherInfoBean currentWeatherInfoBean = loadCurrentInTimeWeatherRecord(cityDistrictBean);
                     WeatherInfoBean lastestWeatherInfo = latestWeatherInfoMap.get(districtNo);
-
 
                     Session session = sessionFactory.openSession();
                     if(lastestWeatherInfo != null){
