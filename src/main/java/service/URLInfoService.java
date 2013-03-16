@@ -1,8 +1,8 @@
 package service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -22,28 +22,50 @@ public class URLInfoService {
         return service;
     }
 
+    public String getXmlSringByDistrictId(String districtId){
+        String districtUrl = FLASHHEADER + districtId + ".xml";
+        return fetchInfoFromUrl(districtUrl);
+    }
+
+    public String fetchHtmlJsonStringById(String districtId){
+        String districtUrl = WEATHERHEADER + districtId + ".html";
+
+        return fetchInfoFromUrl(districtUrl);
+
+    }
+
+    public String fetchHtmlStringById(String districtId){
+        String districtUrl = URLHEADER + districtId + ".shtml";
+
+        return fetchInfoFromUrl(districtUrl);
+    }
+
     public String fetchInfoFromUrl(String urlName){
         StringBuilder sbr = new StringBuilder();
         try {
             URL url = new URL(urlName);
-            BufferedReader inputStream = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line;
-            while((line=inputStream.readLine())!= null){
-                sbr.append(line);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String lineStr;
+            while ((lineStr = bufferedReader.readLine()) != null){
+                sbr.append(lineStr);
             }
-
         } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            sbr.delete(0,sbr.length());
+            e.printStackTrace();
+            System.out.println(urlName);
+            sbr.append(fetchInfoFromUrl(urlName));
         }
-
         return sbr.toString();
     }
-
-    public static URLInfoService service;
-
     private URLInfoService(){
 
     }
+
+    private static URLInfoService service;
+
+    private static final String URLHEADER = "http://www.weather.com.cn/weather/";
+    private static final String WEATHERHEADER = "http://www.weather.com.cn/data/sk/";
+    private static final String FLASHHEADER = "http://flash.weather.com.cn/sk2/";
 }

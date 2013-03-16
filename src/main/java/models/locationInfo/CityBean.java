@@ -14,7 +14,7 @@ public class CityBean {
 
     public CityBean(String provinceNo, String cityNo, String cityName) {
         this.provinceNo = provinceNo;
-        this.cityNo = cityNo;
+        this.cityNo = provinceNo + cityNo;
         this.cityName = cityName;
         this.districtBeanList = new ArrayList<CityDistrictBean>();
     }
